@@ -78,10 +78,39 @@ in `claude_agent.py` -- the original had an unreachable
 at both Claude call sites (the broader clause already catches
 `JSONDecodeError`, so the second one could never fire).
 
+## Step 3 -- distributed into the 8 CLI tool repos
+
+Each tool got only the files it actually needed, copied in (not pip-installed,
+same vendoring pattern as `entity_resolver.py`), call sites swapped, existing
+test suite re-run for regressions, committed and pushed individually:
+
+| Repo | Files added | Notes |
+|---|---|---|
+| friendshore | (covered in Step 2) | entity_resolver.py upgrade flagged as optional, not done |
+| tech_scanner | `claude_client.py` | consistency pass -- call site was already safe |
+| osint_triage | `claude_client.py`, `demo_mode.py` | demo_mode.py added but deliberately NOT wired up -- this tool's `demo` command and live `triage` command stay as separate code paths, no forced DEMO_MODE flag |
+| osint_brief | `claude_client.py`, `arxiv_client.py` | agent.py's `_decide_next`/`_synthesize` no longer take a client object; `sources/arxiv.py` is now a thin adapter over the shared client |
+| volt_typhoon | `claude_client.py` | added 2 tests for a previously entirely-untested live-mode path |
+| ics_assessor | `claude_client.py` | 2 call sites (advisory_parser.py, report_generator.py); added 6 tests, including a new test_report_generator.py that didn't exist before |
+| dragonbridge_analyzer | `claude_client.py` | added 2 tests for a previously-untested live-mode path |
+
+Every repo's full existing test suite was re-run after its swap with zero
+regressions. Several tools (volt_typhoon, ics_assessor, dragonbridge_analyzer)
+had genuinely zero test coverage of their live-mode Claude call before this
+pass -- new tests were added alongside the refactor rather than left
+uncovered.
+
+One pre-existing, unrelated test failure was found and left alone during the
+osint_brief port (`test_brief.py::test_source_log_shows_tool_and_query`,
+confirmed via `git stash` to fail identically on unmodified master -- a
+table-column-truncation display bug, out of scope for this distribution pass).
+
 ## Status
 
-Step 1 (shared-core reference library) and Step 2 (web merge of sam_agent +
-friendshore + sentinel) are both complete. 146 tests passing (83 shared-core
-+ 63 ported/new web-app tests), all mocked -- no real network/API calls.
-Step 3 (distributing the shared-core files into the 8 CLI tool repos) hasn't
-started yet.
+All three steps of the Phase 6 Cluster 2 plan are complete: the shared-core
+reference library (Step 1), the web merge of sam_agent + friendshore +
+sentinel (Step 2, live at analysts-desk.onrender.com), and distribution of
+the shared-core files into the 8 CLI tool repos (Step 3). 146 tests passing
+in this repo (83 shared-core + 63 ported/new web-app tests); each of the 6
+CLI repos that received files re-ran its own full suite with zero
+regressions.
