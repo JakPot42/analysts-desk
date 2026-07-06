@@ -15,9 +15,10 @@ things:
    into each consuming repo the same way `entity_resolver.py` has already been
    copied four times across this portfolio (GhostTrace -> tech_scanner ->
    PatientFusion -> entity_graph).
-2. **A web merge** (coming next) of the 3 FastAPI apps in the cluster
-   (sam_agent, friendshore, sentinel) into one deployment -- shared
-   infrastructure, not shared data.
+2. **A web merge** of the 3 FastAPI apps in the cluster (sam_agent,
+   friendshore, sentinel) into one deployment -- shared infrastructure, not
+   shared data. Landing page (`templates/landing.html`) just links out to the
+   three tools; there's no unifying entity view.
 
 ## `shared/` contents
 
@@ -46,9 +47,41 @@ things:
   every tool onto the same UX, it just stops the parsing logic from
   drifting further.
 
+## Web merge (`/sam`, `/friendshore`, `/sentinel`)
+
+One FastAPI process, one shared SQLite DB via `database.py`, one landing
+page. Each tool keeps its own tables, own Claude prompts, own domain logic --
+only infrastructure is shared (the DB engine, the static-mount discipline,
+the `shared/claude_client.py` wrapper).
+
+**Real table-name collision found and fixed during the port:** sam_agent's
+`Analysis` model and friendshore's `SupplyChainAnalysis` model both used
+`__tablename__ = "analyses"`. All three tools' tables are now prefixed
+(`sam_*`, `friendshore_*`, `sentinel_*`) to remove that collision and any
+future one, in one pass rather than fixing them as found.
+
+**Route/static collisions resolved the same way Arbor's were:** all three
+standalone apps mounted a bare `/static` and served routes off a bare `/`.
+Routes are now under `/sam`, `/friendshore`, `/sentinel`; static assets under
+`/static/sam`, `/static/friendshore`, `/static/sentinel`.
+
+**Verified end-to-end over real HTTP before considering this done** (not
+just unit tests): booted the merged server and hit every route for all
+three tools, including FriendShore's actual matplotlib-rendered graph PNG
+being served through the new static mount, SENTINEL's `/api/stats` and
+cluster/report detail pages, idempotent re-seeding for all three (counts
+unchanged on re-seed), and correct 404s for missing records.
+
+Minor disclosed cleanup during the friendshore port: dropped a latent no-op
+in `claude_agent.py` -- the original had an unreachable
+`except json.JSONDecodeError` clause after a catch-all `except Exception`
+at both Claude call sites (the broader clause already catches
+`JSONDecodeError`, so the second one could never fire).
+
 ## Status
 
-Step 1 of the Phase 6 Cluster 2 plan: shared-core reference files, built and
-tested standalone (83 tests, all mocked -- no real network/API calls). Not
-yet distributed into the 8 CLI tool repos (that's Step 3) and the web merge
-(Step 2) hasn't started yet.
+Step 1 (shared-core reference library) and Step 2 (web merge of sam_agent +
+friendshore + sentinel) are both complete. 146 tests passing (83 shared-core
++ 63 ported/new web-app tests), all mocked -- no real network/API calls.
+Step 3 (distributing the shared-core files into the 8 CLI tool repos) hasn't
+started yet.

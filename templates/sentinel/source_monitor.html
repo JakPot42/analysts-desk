@@ -1,0 +1,76 @@
+{% extends "sentinel/base.html" %}
+{% block title %}Source Monitor — SENTINEL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>SOURCE MONITOR</h1>
+    <p>Tracked RSS feeds and social sources — article counts and last activity</p>
+  </div>
+  <form method="post" action="/sentinel/ingest">
+    <button class="btn btn-primary btn-sm" type="submit">Refresh All Sources</button>
+  </form>
+</div>
+
+{% if source_stats %}
+<div class="section-title" style="margin-bottom:0">
+  <span class="source-dot dot-adversary" style="display:inline-block; margin-right:4px"></span> Adversary &nbsp;&nbsp;
+  <span class="source-dot dot-baseline"  style="display:inline-block; margin-right:4px"></span> Baseline &nbsp;&nbsp;
+  <span class="source-dot dot-social"    style="display:inline-block; margin-right:4px"></span> Social
+</div>
+
+<table class="cluster-table" style="margin-top:12px">
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Type</th>
+      <th>Articles Ingested</th>
+      <th>Last Seen</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in source_stats %}
+    <tr class="source-row-{{ row.outlet_type }}">
+      <td>{{ row.source_name }}</td>
+      <td><span class="badge badge-{{ row.outlet_type }}">{{ row.outlet_type }}</span></td>
+      <td>{{ row.count }}</td>
+      <td style="font-size:12px; color:var(--muted)">
+        {% if row.last_seen %}{{ row.last_seen.strftime("%Y-%m-%d %H:%M") }} UTC{% else %}—{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+<div class="empty-state">
+  <div class="big">[ ]</div>
+  <p>No sources ingested yet.</p>
+  <p style="margin-top:8px">Click <strong>Refresh All Sources</strong> to fetch from configured RSS feeds and Reddit.</p>
+</div>
+{% endif %}
+
+<!-- Configured sources -->
+<div style="margin-top:40px">
+  <div class="section-title">Configured Feed Sources</div>
+  <div style="font-size:12px; color:var(--muted)">
+    <p style="margin-bottom:8px">RSS feeds monitored by SENTINEL (edit <code style="background:var(--surface2); padding:1px 5px; border-radius:2px">config.py</code> to modify):</p>
+    <table class="cluster-table">
+      <thead><tr><th>Name</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>RT English</td><td><span class="badge badge-adversary">adversary</span></td></tr>
+        <tr><td>Sputnik News</td><td><span class="badge badge-adversary">adversary</span></td></tr>
+        <tr><td>TASS International</td><td><span class="badge badge-adversary">adversary</span></td></tr>
+        <tr><td>Global Times</td><td><span class="badge badge-adversary">adversary</span></td></tr>
+        <tr><td>Reuters World</td><td><span class="badge badge-baseline">baseline</span></td></tr>
+        <tr><td>BBC World</td><td><span class="badge badge-baseline">baseline</span></td></tr>
+        <tr><td>Reddit r/worldnews</td><td><span class="badge badge-social">social</span></td></tr>
+        <tr><td>Reddit r/news</td><td><span class="badge badge-social">social</span></td></tr>
+        <tr><td>Reddit r/conspiracy</td><td><span class="badge badge-social">social</span></td></tr>
+        <tr><td>Reddit r/military</td><td><span class="badge badge-social">social</span></td></tr>
+        <tr><td>Reddit r/antiwar</td><td><span class="badge badge-social">social</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

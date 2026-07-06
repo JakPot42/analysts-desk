@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_title }}{% endblock %}</title>
+  <link rel="stylesheet" href="/static/sam/css/app.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  {% if demo_mode %}<div class="demobar">{{ demo_banner }}</div>{% endif %}
+
+  <nav class="nav">
+    <div class="brand">
+      <div class="seal">SAM</div>
+      <div>
+        <h1>Acquisition Intelligence Agent</h1>
+        <div class="sub">SAM.gov Opportunity Analyzer &middot; Powered by Claude AI</div>
+      </div>
+    </div>
+    <div class="links">
+      <a href="/sam/" class="{{ 'active' if active=='search' else '' }}">Search</a>
+      <a href="/sam/history" class="{{ 'active' if active=='history' else '' }}">History</a>
+    </div>
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="app-foot">
+    Analysis is AI-generated and for informational purposes only. Verify all requirements against the official solicitation on SAM.gov before submitting a proposal.
+  </footer>
+</body>
+</html>

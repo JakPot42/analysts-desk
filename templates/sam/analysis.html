@@ -1,0 +1,156 @@
+{% extends "sam/base.html" %}
+{% set active = 'history' %}
+{% block title %}Analysis &middot; {{ analysis.opportunity.title }} &middot; {{ app_title }}{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <div class="breadcrumb">
+      <a href="/sam/">Search</a> &rsaquo;
+      <a href="/sam/opportunity/{{ analysis.opportunity.notice_id }}">Opportunity</a> &rsaquo;
+      Analysis
+    </div>
+    <h2>Compliance Matrix</h2>
+    <p class="sub-agency">{{ analysis.opportunity.title }}</p>
+  </div>
+
+  <!-- Summary card -->
+  <div class="card card-summary">
+    <div class="summary-grid">
+      <div class="summary-main">
+        <h3>Summary</h3>
+        <p>{{ analysis.summary or '—' }}</p>
+        {% if analysis.bottom_line %}
+        <div class="bottom-line">
+          <strong>Bottom line:</strong> {{ analysis.bottom_line }}
+        </div>
+        {% endif %}
+      </div>
+      <div class="summary-meta">
+        <dl class="detail-grid">
+          <dt>Agency</dt><dd>{{ analysis.agency or '—' }}</dd>
+          <dt>Est. Value</dt><dd>{{ analysis.estimated_value or 'Not stated' }}</dd>
+          <dt>Period</dt><dd>{{ analysis.period_of_performance or 'Not stated' }}</dd>
+          <dt>Location</dt><dd>{{ analysis.place_of_performance or 'Not stated' }}</dd>
+          <dt>Clearance</dt>
+          <dd>
+            {% if analysis.clearance_required %}
+              <span class="badge badge-alert">{{ analysis.clearance_required }}</span>
+            {% else %}
+              None stated
+            {% endif %}
+          </dd>
+          <dt>CMMC</dt>
+          <dd>
+            {% if analysis.cmmc_level %}
+              <span class="badge badge-alert">{{ analysis.cmmc_level }}</span>
+            {% else %}
+              None stated
+            {% endif %}
+          </dd>
+          <dt>Set-Aside</dt><dd>{{ analysis.set_aside or 'None' }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- Executive summary — regulatory citations -->
+  {% set exec_flags = analysis.executive_summary_flags %}
+  {% if exec_flags %}
+  <div class="card card-exec-summary">
+    <h3>Regulatory Compliance Executive Summary</h3>
+    <p class="hint">Key FAR/DFARS obligations identified in this solicitation:</p>
+    <div class="exec-flags">
+      {% for item in exec_flags %}
+      <div class="exec-flag exec-flag-{{ item.severity | lower }}">
+        <div class="exec-flag-head">
+          <span class="exec-flag-sev badge badge-{{ item.severity | lower }}">{{ item.severity }}</span>
+          <strong class="exec-flag-title">{{ item.title }}</strong>
+          <code class="exec-flag-clause">{{ item.clause }}</code>
+        </div>
+        <p class="exec-flag-desc">{{ item.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Compliance flags -->
+  {% if analysis.compliance_flags %}
+  <div class="card">
+    <h3>Compliance Flags</h3>
+    <div class="flags">
+      {% for flag in analysis.compliance_flags %}
+      <div class="flag flag-{{ flag.severity | lower }}">
+        <span class="flag-sev">{{ flag.severity }}</span>
+        {{ flag.flag }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Requirements table -->
+  {% if analysis.key_requirements %}
+  <div class="card">
+    <h3>Key Requirements</h3>
+    <table class="req-table">
+      <thead>
+        <tr><th>#</th><th>Requirement</th><th>Category</th></tr>
+      </thead>
+      <tbody>
+        {% for req in analysis.key_requirements %}
+        <tr>
+          <td class="req-num">{{ loop.index }}</td>
+          <td>{{ req.requirement }}</td>
+          <td><span class="badge badge-cat">{{ req.category }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Evaluation criteria -->
+  {% if analysis.evaluation_criteria %}
+  <div class="card">
+    <h3>Evaluation Criteria</h3>
+    <table class="req-table">
+      <thead>
+        <tr><th>#</th><th>Criterion</th><th>Weight / Importance</th></tr>
+      </thead>
+      <tbody>
+        {% for crit in analysis.evaluation_criteria %}
+        <tr>
+          <td class="req-num">{{ loop.index }}</td>
+          <td>{{ crit.criterion }}</td>
+          <td class="subtle">{{ crit.weight or 'Not stated' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Capability statement -->
+  {% if analysis.capability_bullets %}
+  <div class="card">
+    <h3>Capability Statement Outline</h3>
+    <p class="hint">Suggested talking points tailored to this specific solicitation:</p>
+    <ul class="cap-list">
+      {% for bullet in analysis.capability_bullets %}
+      <li>{{ bullet }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="action-row">
+    <a class="btn btn-ghost" href="/sam/opportunity/{{ analysis.opportunity.notice_id }}">&larr; Back to Opportunity</a>
+    <a class="btn btn-ghost" href="/sam/history">View History</a>
+    {% if analysis.opportunity.ui_link %}
+    <a class="btn btn-ghost" href="{{ analysis.opportunity.ui_link }}" target="_blank" rel="noopener">View on SAM.gov &nearr;</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

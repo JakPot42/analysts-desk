@@ -1,0 +1,130 @@
+{% extends "sentinel/base.html" %}
+{% block title %}Dashboard — {{ app_title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>NARRATIVE CLUSTER DASHBOARD</h1>
+    <p>Active influence operation narratives ranked by threat level and velocity</p>
+  </div>
+  <div class="btn-group">
+    {% if demo_mode %}
+    <form method="get" action="/sentinel/seed" style="display:inline">
+      <button class="btn btn-secondary btn-sm" type="submit">Load Demo Data</button>
+    </form>
+    {% endif %}
+    <form method="post" action="/sentinel/ingest" style="display:inline">
+      <button class="btn btn-secondary btn-sm" type="submit">Ingest Live Feeds</button>
+    </form>
+    <form method="post" action="/sentinel/analyze" style="display:inline">
+      <button class="btn btn-primary btn-sm" type="submit"
+        {% if unanalyzed_count == 0 %}disabled title="No unanalyzed articles"{% endif %}>
+        Analyze ({{ unanalyzed_count }})
+      </button>
+    </form>
+    <form method="post" action="/sentinel/reports/generate" style="display:inline">
+      <button class="btn btn-warning btn-sm" type="submit"
+        {% if clusters|length == 0 %}disabled title="No clusters to report on"{% endif %}>
+        Generate Report
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stat-grid">
+  <div class="stat-card {% if high_threat_clusters > 0 %}red{% else %}green{% endif %}">
+    <div class="label">High Threat</div>
+    <div class="value">{{ high_threat_clusters }}</div>
+  </div>
+  <div class="stat-card accent">
+    <div class="label">Active Clusters</div>
+    <div class="value">{{ clusters|length }}</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="label">Total Articles</div>
+    <div class="value">{{ total_articles }}</div>
+  </div>
+  <div class="stat-card red">
+    <div class="label">Adversary Articles</div>
+    <div class="value">{{ adversary_articles }}</div>
+  </div>
+  <div class="stat-card {% if unanalyzed_count > 0 %}yellow{% else %}green{% endif %}">
+    <div class="label">Pending Analysis</div>
+    <div class="value">{{ unanalyzed_count }}</div>
+  </div>
+</div>
+
+<!-- Cluster table -->
+{% if clusters %}
+<div class="section-title">Active Narrative Clusters</div>
+<table class="cluster-table">
+  <thead>
+    <tr>
+      <th>Threat</th>
+      <th>Narrative</th>
+      <th>Sources</th>
+      <th>Articles</th>
+      <th>Velocity</th>
+      <th>Spread</th>
+      <th>TTPs</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cluster in clusters %}
+    <tr>
+      <td><span class="badge {{ cluster.threat_badge_class }}">{{ cluster.threat_level }}</span></td>
+      <td>
+        <a href="/sentinel/cluster/{{ cluster.id }}" class="cluster-label">{{ cluster.label }}</a>
+        {% if cluster.summary %}
+        <div style="font-size:11px; color: var(--muted); margin-top:3px; max-width:500px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ cluster.summary }}</div>
+        {% endif %}
+      </td>
+      <td>
+        <div class="source-bar">
+          {% if cluster.adversary_count > 0 %}
+          <span class="source-dot dot-adversary"></span>
+          <span style="color:var(--adversary)">{{ cluster.adversary_count }}</span>
+          {% endif %}
+          {% if cluster.social_count > 0 %}
+          <span class="source-dot dot-social" style="margin-left:6px"></span>
+          <span style="color:var(--social)">{{ cluster.social_count }}</span>
+          {% endif %}
+          {% if cluster.baseline_count > 0 %}
+          <span class="source-dot dot-baseline" style="margin-left:6px"></span>
+          <span style="color:var(--baseline)">{{ cluster.baseline_count }}</span>
+          {% endif %}
+        </div>
+      </td>
+      <td>{{ cluster.article_count }}</td>
+      <td>
+        <span style="font-size:12px; color:var(--yellow)">{{ "%.2f"|format(cluster.velocity_score) }}</span>
+        <div class="velocity-bar">
+          <div class="velocity-fill" style="width:{{ [cluster.velocity_score * 100, 100]|min }}%"></div>
+        </div>
+      </td>
+      <td style="font-size:12px; color:var(--muted)">{{ cluster.spread_hours }}h</td>
+      <td>
+        {% for ttp in cluster.ttp_tags[:3] %}
+        <span class="badge badge-yellow" style="margin-bottom:2px; display:inline-block">{{ ttp.ttp_id }}</span>
+        {% endfor %}
+        {% if cluster.ttp_tags|length == 0 %}
+        <span style="color:var(--muted); font-size:11px">—</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+<div class="empty-state">
+  <div class="big">[ ]</div>
+  <p>No narrative clusters detected.</p>
+  <p style="margin-top:8px">
+    {% if demo_mode %}Click <strong>Load Demo Data</strong> to see Operation STEEL ECHO, or{% else %}Click{% endif %}
+    <strong>Ingest Live Feeds</strong> to pull from RSS sources, then <strong>Analyze</strong> to run Claude narrative extraction.
+  </p>
+</div>
+{% endif %}
+{% endblock %}

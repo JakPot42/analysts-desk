@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{{ app_title }}{% endblock %}</title>
+  <link rel="stylesheet" href="/static/sentinel/css/app.css" />
+</head>
+<body>
+
+{% if demo_mode %}
+<div class="demo-banner">⚠ {{ demo_banner }}</div>
+{% endif %}
+
+<nav>
+  <a href="/sentinel/" class="nav-brand">SENTINEL <span>// IO DETECTION</span></a>
+  <a href="/sentinel/" {% if request.url.path == "/sentinel/" %}class="active"{% endif %}>Dashboard</a>
+  <a href="/sentinel/reports" {% if "/report" in request.url.path %}class="active"{% endif %}>Intel Reports</a>
+  <a href="/sentinel/sources" {% if "/sources" in request.url.path %}class="active"{% endif %}>Source Monitor</a>
+</nav>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

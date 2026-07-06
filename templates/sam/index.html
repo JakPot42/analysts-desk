@@ -1,0 +1,53 @@
+{% extends "sam/base.html" %}
+{% set active = 'search' %}
+{% block title %}Search Opportunities &middot; {{ app_title }}{% endblock %}
+
+{% block content %}
+<div class="wrap wrap--narrow">
+  <div class="page-head">
+    <h2>Search Contract Opportunities</h2>
+    <p>Enter keywords to search SAM.gov's active solicitations. The agent will
+       retrieve matching opportunities and let you run a full AI compliance analysis
+       on any of them.</p>
+  </div>
+
+  <div class="card">
+    <form method="get" action="/sam/search">
+      <div class="search-row">
+        <input type="text" name="q" class="search-input" autofocus
+               placeholder="e.g. cybersecurity IT support, CMMC assessment, network operations..."
+               required>
+        <button type="submit" class="btn btn-primary" id="search-btn"
+              onclick="this.textContent='Searching SAM.gov…'; this.disabled=true; this.form.submit()">
+        Search SAM.gov &rarr;
+      </button>
+      </div>
+      <div class="hint" style="margin-top:0.5rem">
+        Try: <a href="/sam/search?q=cybersecurity">cybersecurity</a> &middot;
+             <a href="/sam/search?q=cloud+infrastructure">cloud infrastructure</a> &middot;
+             <a href="/sam/search?q=CMMC+assessment">CMMC assessment</a> &middot;
+             <a href="/sam/search?q=software+development+Army">software development Army</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="background:#f0f4f8; border-color:#c8d8e8; margin-bottom:1rem">
+    <strong>No API quota?</strong> Load pre-analyzed demo opportunities to explore the full
+    compliance matrix workflow without hitting SAM.gov.
+    <form method="post" action="/sam/seed" style="display:inline; margin-left:0.75rem">
+      <button class="btn btn-ghost btn-sm" type="submit">Load Demo Data</button>
+    </form>
+    <a class="btn btn-ghost btn-sm" href="/sam/history" style="margin-left:0.5rem">View History</a>
+  </div>
+
+  <div class="explainer">
+    <h3>How it works</h3>
+    <div class="steps">
+      <div class="step"><span class="step-n">1</span><div>Search SAM.gov for active solicitations by keyword.</div></div>
+      <div class="step"><span class="step-n">2</span><div>Select an opportunity to view its full details.</div></div>
+      <div class="step"><span class="step-n">3</span><div>Click <strong>Analyze with Claude</strong> — the AI reads the RFP and extracts requirements, compliance flags, and evaluation criteria.</div></div>
+      <div class="step"><span class="step-n">4</span><div>Review your compliance matrix and capability statement outline.</div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

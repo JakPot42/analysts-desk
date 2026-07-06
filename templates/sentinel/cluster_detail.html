@@ -1,0 +1,150 @@
+{% extends "sentinel/base.html" %}
+{% block title %}{{ cluster.label[:60] }} — SENTINEL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px">
+      <a href="/sentinel/" style="color:var(--muted); text-decoration:none">Dashboard</a> /
+      Cluster #{{ cluster.id }}
+    </div>
+    <h1>{{ cluster.label }}</h1>
+    <p>First seen {{ cluster.first_seen.strftime("%Y-%m-%d %H:%M") if cluster.first_seen }} UTC ·
+       Spread {{ cluster.spread_hours }}h ·
+       {{ cluster.article_count }} articles</p>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center">
+    <span class="badge {{ cluster.threat_badge_class }}" style="font-size:13px; padding:4px 12px">
+      {{ cluster.threat_level }} THREAT
+    </span>
+    <form method="post" action="/sentinel/cluster/{{ cluster.id }}/analyze-ttps">
+      <button class="btn btn-warning btn-sm" type="submit">Analyze TTPs with AI</button>
+    </form>
+  </div>
+</div>
+
+<!-- Cluster stats row -->
+<div class="stat-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom:24px">
+  <div class="stat-card red">
+    <div class="label">Adversary</div>
+    <div class="value">{{ cluster.adversary_count }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Social</div>
+    <div class="value" style="color:var(--social)">{{ cluster.social_count }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Baseline</div>
+    <div class="value">{{ cluster.baseline_count }}</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="label">Velocity</div>
+    <div class="value">{{ "%.2f"|format(cluster.velocity_score) }}</div>
+  </div>
+  <div class="stat-card accent">
+    <div class="label">TTPs Tagged</div>
+    <div class="value">{{ cluster.ttp_tags|length }}</div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 2fr 1fr; gap:24px">
+
+  <!-- Left: Articles -->
+  <div>
+    <!-- Summary -->
+    {% if cluster.summary %}
+    <div class="card" style="margin-bottom:20px">
+      <div class="section-title">Cluster Summary</div>
+      <p style="font-size:13px; color:var(--muted); line-height:1.6">{{ cluster.summary }}</p>
+    </div>
+    {% endif %}
+
+    {% for outlet_type, articles in articles_by_type.items() %}
+    {% if articles %}
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <span class="badge badge-{{ outlet_type }}" style="margin-right:6px">{{ outlet_type }}</span>
+          {{ articles|length }} article{{ "s" if articles|length != 1 }}
+        </h3>
+      </div>
+      {% for article in articles %}
+      <div class="article-item">
+        <div class="article-title">{{ article.title }}</div>
+        <div class="article-meta">
+          <span style="color:var(--accent)">{{ article.source_name }}</span>
+          {% if article.published_at %}
+          <span class="timeline-dot">{{ article.published_at.strftime("%H:%M UTC") }}</span>
+          {% endif %}
+          {% if article.sentiment %}
+          <span class="badge badge-{% if article.sentiment == 'negative' %}red{% elif article.sentiment == 'positive' %}green{% else %}gray{% endif %}" style="font-size:10px">
+            {{ article.sentiment }}
+          </span>
+          {% endif %}
+          {% if article.is_divisive %}
+          <span class="badge badge-yellow" style="font-size:10px">divisive</span>
+          {% endif %}
+        </div>
+        {% if article.narrative_summary %}
+        <div class="article-narrative">{{ article.narrative_summary }}</div>
+        {% endif %}
+        {% if article.credibility_signals %}
+        <div class="article-signals">
+          {% for sig in article.credibility_signals %}
+          <span class="signal-tag">{{ sig }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if article.keywords %}
+        <div style="margin-top:5px; font-size:11px; color:var(--muted)">
+          {% for kw in article.keywords %}
+          <code style="background:var(--surface2); padding:1px 5px; border-radius:2px; margin-right:3px; font-size:10px">{{ kw }}</code>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Right: TTP Analysis -->
+  <div>
+    <div class="section-title">DISARM TTP Analysis</div>
+
+    {% if cluster.ttp_tags %}
+    {% for ttp in cluster.ttp_tags %}
+    <div class="ttp-card">
+      <div class="ttp-header">
+        <span class="ttp-id">{{ ttp.ttp_id }}</span>
+        <span class="badge {{ ttp.confidence_badge_class }}" style="font-size:10px">{{ ttp.confidence }}</span>
+      </div>
+      <div class="ttp-name">{{ ttp.ttp_name }}</div>
+      <div class="ttp-rationale" style="margin-top:6px">{{ ttp.rationale }}</div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="card" style="text-align:center; padding:32px 20px">
+      <p style="color:var(--muted); font-size:12px; margin-bottom:12px">No TTP analysis yet.</p>
+      <form method="post" action="/sentinel/cluster/{{ cluster.id }}/analyze-ttps">
+        <button class="btn btn-warning btn-sm" type="submit">Run TTP Analysis</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <!-- Generate intel report -->
+    <div style="margin-top:24px">
+      <div class="section-title">Intelligence Product</div>
+      <form method="post" action="/sentinel/reports/generate">
+        <button class="btn btn-primary" type="submit" style="width:100%">Generate Intel Report</button>
+      </form>
+      <div style="font-size:11px; color:var(--muted); margin-top:8px">
+        Generates a full intelligence assessment across all active clusters.
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

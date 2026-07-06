@@ -1,0 +1,67 @@
+{% extends "sam/base.html" %}
+{% set active = 'search' %}
+{% block title %}Results for "{{ query }}" &middot; {{ app_title }}{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <h2>Results for &ldquo;{{ query }}&rdquo;</h2>
+    {% if not error %}
+      <p>{{ total }} active solicitations found on SAM.gov. Showing up to 10.</p>
+    {% endif %}
+  </div>
+
+  <form method="get" action="/sam/search" style="margin-bottom:1.5rem">
+    <div class="search-row">
+      <input type="text" name="q" class="search-input" value="{{ query }}">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </form>
+
+  {% if error %}
+    <div class="alert alert-error">
+      <strong>SAM.gov unavailable:</strong> {{ error }}
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h3>Try demo data instead</h3>
+      <p>While the live API is unavailable, you can load pre-analyzed sample opportunities
+         to explore the full compliance matrix workflow.</p>
+      <form method="post" action="/sam/seed" style="margin-top:0.75rem">
+        <button class="btn btn-primary" type="submit">Load Demo Opportunities &rarr;</button>
+      </form>
+    </div>
+  {% elif not opportunities %}
+    <div class="empty-state">No active opportunities found for that query. Try different keywords.</div>
+  {% else %}
+    <div class="opp-list">
+      {% for opp in opportunities %}
+      <div class="opp-card">
+        <div class="opp-header">
+          <a class="opp-title" href="/sam/opportunity/{{ opp.noticeId }}">{{ opp.title }}</a>
+          <span class="badge badge-naics">NAICS {{ opp.naicsCode or 'N/A' }}</span>
+          {% if opp.typeOfSetAside and opp.typeOfSetAside != 'N/A' %}
+            <span class="badge badge-setaside">{{ opp.typeOfSetAside }}</span>
+          {% endif %}
+        </div>
+        <div class="opp-meta">
+          <span>{{ opp.fullParentPathName or 'Agency N/A' }}</span>
+          <span class="sep">&middot;</span>
+          <span>Posted: {{ opp.postedDate or 'N/A' }}</span>
+          <span class="sep">&middot;</span>
+          <span>Deadline: <strong>{{ opp.responseDeadLine or 'See solicitation' }}</strong></span>
+        </div>
+        {% if opp.description %}
+        <div class="opp-desc">{{ opp.description[:300] }}{% if opp.description|length > 300 %}…{% endif %}</div>
+        {% endif %}
+        <div class="opp-actions">
+          <a class="btn btn-ghost btn-sm" href="/sam/opportunity/{{ opp.noticeId }}">View &amp; Analyze &rarr;</a>
+          {% if opp.uiLink %}
+          <a class="btn btn-ghost btn-sm" href="{{ opp.uiLink }}" target="_blank" rel="noopener">SAM.gov &nearr;</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

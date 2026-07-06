@@ -1,0 +1,67 @@
+{% extends "sam/base.html" %}
+{% set active = 'search' %}
+{% block title %}{{ opp.title }} &middot; {{ app_title }}{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <div class="breadcrumb"><a href="/sam/">Search</a> &rsaquo; Opportunity</div>
+    <h2>{{ opp.title }}</h2>
+    {% if opp.agency %}<p class="sub-agency">{{ opp.agency }}</p>{% endif %}
+  </div>
+
+  <div class="two-col">
+    <div class="main-col">
+      <div class="card">
+        <h3>Solicitation Details</h3>
+        <dl class="detail-grid">
+          <dt>Solicitation #</dt><dd class="mono">{{ opp.solicitation_number or '—' }}</dd>
+          <dt>NAICS Code</dt><dd>{{ opp.naics_code or '—' }}</dd>
+          <dt>Set-Aside</dt><dd>{{ opp.set_aside or 'None' }}</dd>
+          <dt>Posted Date</dt><dd>{{ opp.posted_date or '—' }}</dd>
+          <dt>Response Deadline</dt><dd class="deadline">{{ opp.response_deadline or 'See solicitation' }}</dd>
+        </dl>
+        {% if opp.ui_link %}
+        <a class="btn btn-ghost btn-sm" href="{{ opp.ui_link }}" target="_blank" rel="noopener">View on SAM.gov &nearr;</a>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>Description</h3>
+        <div class="description-text">
+          {{ opp.description or 'No description available in the API response.' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col">
+      <div class="card card-analyze">
+        <h3>AI Analysis</h3>
+        {% if has_analysis %}
+          <p class="analysis-ready">Analysis complete.</p>
+          <a class="btn btn-primary" href="/sam/analysis/{{ analysis_id }}">View Compliance Matrix &rarr;</a>
+          <div style="margin-top:0.75rem">
+            <form method="post" action="/sam/analyze/{{ opp.notice_id }}">
+              <button class="btn btn-ghost btn-sm" type="submit">Re-analyze</button>
+            </form>
+          </div>
+        {% else %}
+          <p>Send this solicitation to Claude AI to get:</p>
+          <ul class="analysis-preview-list">
+            <li>Plain-English summary</li>
+            <li>Key requirements list</li>
+            <li>Compliance flags (CMMC, clearance, etc.)</li>
+            <li>Evaluation criteria breakdown</li>
+            <li>Capability statement outline</li>
+            <li>Go / No-go assessment</li>
+          </ul>
+          <form method="post" action="/sam/analyze/{{ opp.notice_id }}">
+            <button class="btn btn-primary" type="submit">Analyze with Claude &rarr;</button>
+          </form>
+          <div class="hint" style="margin-top:0.5rem">~5-10 seconds &middot; uses ~$0.01 in API credits</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
