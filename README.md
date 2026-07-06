@@ -2,7 +2,7 @@
 
 Merger of 11 source projects: SAM.gov Acquisition Agent, FriendShore, SENTINEL,
 FL OSINT Triage, OSINT Brief Generator, Emerging Tech Scanner, Defense Budget
-Tracker, Volt Typhoon Assessor, IP Theft Pattern Database, Dragonbridge
+Tracker, Infrastructure Exposure Assessor, IP Theft Pattern Database, Dragonbridge
 Analyzer, ICS/SCADA Exposure Assessor.
 
 Unlike Arbor (Phase 6, Cluster 1), this cluster has no single shared business
@@ -90,15 +90,21 @@ test suite re-run for regressions, committed and pushed individually:
 | tech_scanner | `claude_client.py` | consistency pass -- call site was already safe |
 | osint_triage | `claude_client.py`, `demo_mode.py` | demo_mode.py added but deliberately NOT wired up -- this tool's `demo` command and live `triage` command stay as separate code paths, no forced DEMO_MODE flag |
 | osint_brief | `claude_client.py`, `arxiv_client.py` | agent.py's `_decide_next`/`_synthesize` no longer take a client object; `sources/arxiv.py` is now a thin adapter over the shared client |
-| volt_typhoon | `claude_client.py` | added 2 tests for a previously entirely-untested live-mode path |
+| infra_exposure_assessor (renamed from volt_typhoon) | `claude_client.py` | added 2 tests for a previously entirely-untested live-mode path |
 | ics_assessor | `claude_client.py` | 2 call sites (advisory_parser.py, report_generator.py); added 6 tests, including a new test_report_generator.py that didn't exist before |
 | dragonbridge_analyzer | `claude_client.py` | added 2 tests for a previously-untested live-mode path |
 
 Every repo's full existing test suite was re-run after its swap with zero
-regressions. Several tools (volt_typhoon, ics_assessor, dragonbridge_analyzer)
-had genuinely zero test coverage of their live-mode Claude call before this
-pass -- new tests were added alongside the refactor rather than left
-uncovered.
+regressions. Several tools (infra_exposure_assessor, ics_assessor,
+dragonbridge_analyzer) had genuinely zero test coverage of their live-mode
+Claude call before this pass -- new tests were added alongside the refactor
+rather than left uncovered.
+
+Note: `infra_exposure_assessor` was renamed from `volt_typhoon` shortly
+after this Step 3 pass (repo, folder, and product branding only -- the real
+CISA advisory citations and TTP catalog it's built on are unchanged). The
+one cross-project dependency this touched, `risk_correlator`'s live import
+path, was updated and re-verified at the same time.
 
 One pre-existing, unrelated test failure was found and left alone during the
 osint_brief port (`test_brief.py::test_source_log_shows_tool_and_query`,
