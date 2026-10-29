@@ -128,11 +128,11 @@ For each high-risk supplier, suggest 2-3 credible alternative suppliers from FRI
 Return ONLY valid JSON — an array matching this schema (no markdown):
 [
   {{
-    "original_supplier": "Longhua Microelectronics",
+    "original_supplier": "Dogwood Compound Semi (fictional)",
     "component": "GaAs wafers",
     "alternatives": [
       {{
-        "company": "II-VI Incorporated",
+        "company": "Kestrel Wafer Co. (fictional)",
         "country": "USA",
         "rationale": "Leading domestic GaAs wafer manufacturer, qualified for defense programs"
       }}

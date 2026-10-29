@@ -96,26 +96,26 @@ class TestScoreNode:
 class TestFindSinglePointsOfFailure:
     def test_detects_high_risk_articulation_point(self):
         """
-        Graph: MP_Materials → Longhua(China) → Raytheon → DefenseTech
-        Longhua is the articulation point AND high-risk country → SPF.
+        Graph: Ironbark → Dogwood(China) → Alder → ExamplePrime
+        Dogwood is the articulation point AND high-risk country → SPF.
         """
-        focal = "DefenseTech"
-        longhua = SupplierData(name="Longhua", country="China", tier=2)
+        focal = "ExamplePrime"
+        dogwood = SupplierData(name="Dogwood", country="China", tier=2)
         nodes = [
-            SupplierData(name="MP_Materials", country="USA", tier=3),
-            longhua,
-            SupplierData(name="Raytheon", country="USA", tier=1),
+            SupplierData(name="Ironbark", country="USA", tier=3),
+            dogwood,
+            SupplierData(name="Alder", country="USA", tier=1),
             SupplierData(name=focal, country="USA", tier=0, is_focal_company=True),
         ]
         G = nx.DiGraph()
         for n in nodes:
             G.add_node(n.name, data=n)
-        G.add_edge("MP_Materials", "Longhua")
-        G.add_edge("Longhua", "Raytheon")
-        G.add_edge("Raytheon", focal)
+        G.add_edge("Ironbark", "Dogwood")
+        G.add_edge("Dogwood", "Alder")
+        G.add_edge("Alder", focal)
 
         spf = _find_single_points_of_failure(G, focal)
-        assert "Longhua" in spf
+        assert "Dogwood" in spf
 
     def test_friendly_nation_not_flagged_as_spf(self):
         """Even if a US supplier is an articulation point, it should not be flagged."""
