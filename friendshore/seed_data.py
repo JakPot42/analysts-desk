@@ -1,100 +1,98 @@
 """
-seed_data.py — Demo supply chain data for FriendShore.
+seed_data.py -- Demo supply chain data for FriendShore.
 
-Represents a fictional AESA radar prime contractor's Tier 1-3 supply chain,
-seeded with known-risky Chinese suppliers to demonstrate the tool's value.
-
-All company names and relationships are FICTIONAL / SYNTHETIC.
+A fictional AESA radar prime contractor's Tier 1-3 supply chain. Every company
+name here is invented and marked "(fictional)"; none refers to a real company,
+and no certification or qualification is claimed for any of them.
 """
 
 from __future__ import annotations
 
 DEMO_ANALYSES = [
     {
-        "name": "AESA Radar System — DefenseTech Solutions BOM Analysis",
-        "source_text": "See demo — synthetic data",
+        "name": "AESA Radar System: Example Prime Co. BOM Analysis (fictional example)",
+        "source_text": "See demo: synthetic data, fictional companies",
         "overall_risk_score": 72,
         "bottom_line": (
-            "Critical dependency on two Chinese semiconductor suppliers (Longhua Microelectronics "
-            "and Yangtze Memory Technologies) creates significant supply chain vulnerability. "
-            "Longhua is a single point of failure for GaAs wafer supply. Immediate reshoring "
-            "action recommended before next NDAA section 889 compliance review."
+            "Critical dependency on two Chinese suppliers in this fictional example (Dogwood "
+            "Compound Semi and Hazel Memory). Dogwood is a single point of failure for GaAs "
+            "wafer supply. Second-sourcing the wafer step is the first recommended action."
         ),
         "risk_summary": (
             "Three high-risk suppliers identified in Tier 2 and Tier 3. Chinese-sourced GaAs "
-            "wafers and NAND flash represent the most critical exposures. Samsung Electro-Mechanics "
-            "concentration across two Tier-1 suppliers creates a secondary resilience risk."
+            "wafers and NAND flash represent the most critical exposures. Ginkgo Capacitors "
+            "supplies two Tier-1 suppliers, a secondary concentration risk."
         ),
-        "single_points_of_failure": ["Longhua Microelectronics"],
+        "single_points_of_failure": ["Dogwood Compound Semi (fictional)"],
         "alternative_suggestions": [
             {
-                "original_supplier": "Longhua Microelectronics",
+                "original_supplier": "Dogwood Compound Semi (fictional)",
                 "component": "GaAs wafers",
                 "alternatives": [
                     {
-                        "company": "II-VI Incorporated",
+                        "company": "Kestrel Wafer Co. (fictional)",
                         "country": "USA",
-                        "rationale": "Leading domestic GaAs/InP wafer manufacturer with DoD qualification; established supply agreements with major defense primes."
+                        "rationale": "Domestic GaAs wafer source in this example; capacity and lead times would need checking."
                     },
                     {
-                        "company": "Qorvo",
+                        "company": "Larch Epitaxy (fictional)",
                         "country": "USA",
-                        "rationale": "Vertically integrated compound semiconductor manufacturer; ITAR-compliant, CMMC certified, active in AESA programs."
+                        "rationale": "A second domestic source in this example, so the wafer step no longer depends on one supplier."
                     },
                     {
-                        "company": "IQE PLC",
+                        "company": "Maple Epiwafer (fictional)",
                         "country": "UK",
-                        "rationale": "Five Eyes partner nation; world's largest independent epiwafer supplier with US manufacturing presence."
+                        "rationale": "Allied-country source in this example; export terms would need checking."
                     }
                 ]
             },
             {
-                "original_supplier": "Yangtze Memory Technologies",
+                "original_supplier": "Hazel Memory (fictional)",
                 "component": "NAND flash",
                 "alternatives": [
                     {
-                        "company": "Micron Technology",
+                        "company": "Nutmeg Flash (fictional)",
                         "country": "USA",
-                        "rationale": "US-headquartered NAND manufacturer; domestic fabs in Boise ID; qualified for defense-grade flash storage."
+                        "rationale": "Domestic NAND source in this example."
                     },
                     {
-                        "company": "Samsung Semiconductor (US div.)",
+                        "company": "Olive Storage (fictional)",
                         "country": "USA",
-                        "rationale": "New Austin TX fab; US-origin NAND available with proper contractual sourcing requirements."
+                        "rationale": "US-made NAND in this example, for a contract that requires US origin."
                     },
                     {
-                        "company": "Kioxia (formerly Toshiba Memory)",
+                        "company": "Poplar Memory (fictional)",
                         "country": "Japan",
-                        "rationale": "Allied nation; Japan NAND manufacturing; preferred alternative for DoD programs avoiding YMTC."
+                        "rationale": "Allied-country NAND source in this example."
                     }
                 ]
             }
         ],
         "nodes": [
-            {"name": "DefenseTech Solutions",      "country": "USA",         "tier": 0, "component": None,                   "is_focal": True},
-            {"name": "Raytheon Components Group",  "country": "USA",         "tier": 1, "component": "RF/microwave modules", "is_focal": False},
-            {"name": "BAE Systems Electronics",    "country": "UK",          "tier": 1, "component": "Antenna arrays",       "is_focal": False},
-            {"name": "Shimadzu Defense",           "country": "Japan",       "tier": 1, "component": "Signal processors",    "is_focal": False},
-            {"name": "Longhua Microelectronics",   "country": "China",       "tier": 2, "component": "GaAs wafers",          "is_focal": False},
-            {"name": "Texas Instruments Defense",  "country": "USA",         "tier": 2, "component": "FPGAs",                "is_focal": False},
-            {"name": "Infineon Technologies",      "country": "Germany",     "tier": 2, "component": "Power modules",        "is_focal": False},
-            {"name": "Samsung Electro-Mechanics",  "country": "South Korea", "tier": 2, "component": "MLCC capacitors",      "is_focal": False},
-            {"name": "Yangtze Memory Technologies","country": "China",       "tier": 2, "component": "NAND flash",           "is_focal": False},
-            {"name": "MP Materials",               "country": "USA",         "tier": 3, "component": "Rare earth metals",    "is_focal": False},
-            {"name": "CMOC International",         "country": "China",       "tier": 3, "component": "Cobalt",               "is_focal": False},
+            {"name": "Example Prime Co. (fictional)",      "country": "USA",         "tier": 0, "component": None,                   "is_focal": True},
+            {"name": "Alder RF Modules (fictional)",       "country": "USA",         "tier": 1, "component": "RF/microwave modules", "is_focal": False},
+            {"name": "Birch Antenna Works (fictional)",    "country": "UK",          "tier": 1, "component": "Antenna arrays",       "is_focal": False},
+            {"name": "Cedar Signal Systems (fictional)",   "country": "Japan",       "tier": 1, "component": "Signal processors",    "is_focal": False},
+            {"name": "Dogwood Compound Semi (fictional)",  "country": "China",       "tier": 2, "component": "GaAs wafers",          "is_focal": False},
+            {"name": "Elm Logic Devices (fictional)",      "country": "USA",         "tier": 2, "component": "FPGAs",                "is_focal": False},
+            {"name": "Fir Power Electronics (fictional)",  "country": "Germany",     "tier": 2, "component": "Power modules",        "is_focal": False},
+            {"name": "Ginkgo Capacitors (fictional)",      "country": "South Korea", "tier": 2, "component": "MLCC capacitors",      "is_focal": False},
+            {"name": "Hazel Memory (fictional)",           "country": "China",       "tier": 2, "component": "NAND flash",           "is_focal": False},
+            {"name": "Ironbark Rare Earths (fictional)",   "country": "USA",         "tier": 3, "component": "Rare earth metals",    "is_focal": False},
+            {"name": "Jacaranda Cobalt (fictional)",       "country": "China",       "tier": 3, "component": "Cobalt",               "is_focal": False},
         ],
         "edges": [
-            {"supplier": "Raytheon Components Group",  "customer": "DefenseTech Solutions",     "component": "RF/microwave modules"},
-            {"supplier": "BAE Systems Electronics",    "customer": "DefenseTech Solutions",     "component": "Antenna arrays"},
-            {"supplier": "Shimadzu Defense",           "customer": "DefenseTech Solutions",     "component": "Signal processors"},
-            {"supplier": "Longhua Microelectronics",   "customer": "Raytheon Components Group", "component": "GaAs wafers"},
-            {"supplier": "Texas Instruments Defense",  "customer": "Raytheon Components Group", "component": "FPGAs"},
-            {"supplier": "Infineon Technologies",      "customer": "BAE Systems Electronics",   "component": "Power modules"},
-            {"supplier": "Samsung Electro-Mechanics",  "customer": "BAE Systems Electronics",   "component": "MLCC capacitors"},
-            {"supplier": "Samsung Electro-Mechanics",  "customer": "Shimadzu Defense",          "component": "MLCC capacitors"},
-            {"supplier": "Yangtze Memory Technologies","customer": "Shimadzu Defense",          "component": "NAND flash"},
-            {"supplier": "MP Materials",               "customer": "Longhua Microelectronics",  "component": "Rare earth metals"},
-            {"supplier": "CMOC International",         "customer": "Longhua Microelectronics",  "component": "Cobalt"},
+            {"supplier": "Alder RF Modules (fictional)",      "customer": "Example Prime Co. (fictional)",     "component": "RF/microwave modules"},
+            {"supplier": "Birch Antenna Works (fictional)",   "customer": "Example Prime Co. (fictional)",     "component": "Antenna arrays"},
+            {"supplier": "Cedar Signal Systems (fictional)",  "customer": "Example Prime Co. (fictional)",     "component": "Signal processors"},
+            {"supplier": "Dogwood Compound Semi (fictional)", "customer": "Alder RF Modules (fictional)",      "component": "GaAs wafers"},
+            {"supplier": "Elm Logic Devices (fictional)",     "customer": "Alder RF Modules (fictional)",      "component": "FPGAs"},
+            {"supplier": "Fir Power Electronics (fictional)", "customer": "Birch Antenna Works (fictional)",   "component": "Power modules"},
+            {"supplier": "Ginkgo Capacitors (fictional)",     "customer": "Birch Antenna Works (fictional)",   "component": "MLCC capacitors"},
+            {"supplier": "Ginkgo Capacitors (fictional)",     "customer": "Cedar Signal Systems (fictional)",  "component": "MLCC capacitors"},
+            {"supplier": "Hazel Memory (fictional)",          "customer": "Cedar Signal Systems (fictional)",  "component": "NAND flash"},
+            {"supplier": "Ironbark Rare Earths (fictional)",  "customer": "Dogwood Compound Semi (fictional)", "component": "Rare earth metals"},
+            {"supplier": "Jacaranda Cobalt (fictional)",      "customer": "Dogwood Compound Semi (fictional)", "component": "Cobalt"},
         ],
     }
 ]
